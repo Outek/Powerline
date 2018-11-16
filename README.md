@@ -38,8 +38,8 @@ notepad $PROFILE
 
 Add these lines
 
-Import-Module posh-git
-Import-Module oh-my-posh
-Set-Theme Paradox_Sigi
+* Import-Module posh-git
+* Import-Module oh-my-posh
+* Set-Theme Paradox_Sigi
 
 [Link](https://github.com/Jaykul/PowerLine/blob/acdb08698b71a40177c72c9d7aa4ee36c08f4c3d/README.md)
