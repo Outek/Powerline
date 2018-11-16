@@ -47,3 +47,14 @@ Add these lines
 ## Copy Paradox_Sigi 
 
 Copy the file to theme folder or 'C:\Program Files\WindowsPowerShell\Modules\oh-my-posh\2.0.230\Themes'
+
+## Configure vscode to use the font
+
+```Powershell
+
+{
+    "terminal.integrated.fontFamily": "Meslo LG S for Powerline",
+    "terminal.integrated.fontSize": 12,
+}
+
+```
