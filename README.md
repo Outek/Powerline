@@ -53,7 +53,7 @@ Copy the file to theme folder or 'C:\Program Files\WindowsPowerShell\Modules\oh-
 ```Powershell
 
 {
-    "terminal.integrated.fontFamily": "Meslo LG S for Powerline",
+    "terminal.integrated.fontFamily": "'Meslo LG S for Powerline'",
     "terminal.integrated.fontSize": 12,
 }
 
