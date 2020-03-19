@@ -1,5 +1,19 @@
 # Installation of Powerline, Fonts, Powershell Profile and more
 
+## Files
+
+### Microsoft.PowerShell_profile.ps1
+Powershell profile
+
+### profiles.json
+Windows Terminal configurations
+ 
+### Paradox_Sigi.psm1
+Modified Paradox Theme from Powerline
+
+### settings.json
+Personal vscode settings
+
 ## Install needed fonts
 
 Install all Cascadia Code Fonts
