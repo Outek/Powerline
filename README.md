@@ -1,21 +1,9 @@
-# Installation of Powerline, Fonts, Powershell Pfrofile and more
+# Installation of Powerline, Fonts, Powershell Profile and more
 
 ## Install needed fonts
 
-Install Powerline Fonts
-
-Clone the powerline repository from GitHub.
-
-git clone https://github.com/powerline/fonts.git
-
-afterward, do the following:
-
-```powershell
-
-cd fonts
-.\install.ps1
-
-```
+Install all Cascadia Code Fonts
+[GitHub Repo](https://github.com/microsoft/cascadia-code/releases
 
 ## Install Powershell Modules
 
@@ -36,25 +24,120 @@ notepad $PROFILE
 
 ```
 
-Add these lines
+and copy this lines to theProfiles file
 
-* Import-Module posh-git
-* Import-Module oh-my-posh
-* Set-Theme Paradox_Sigi
+```powershell
+#Requires -Version 7
 
-[Link](https://github.com/Jaykul/PowerLine/blob/acdb08698b71a40177c72c9d7aa4ee36c08f4c3d/README.md)
+# Version 1.0.6
+
+# check if newer version
+$gistUrl = "https://api.github.com/gists/569c2288c015150eba622e860a4a6d2b"
+$latestVersionFile = Join-Path -Path ~ -ChildPath ".latest_profile_version"
+$versionRegEx = "# Version (?<version>\d+\.\d+\.\d+)"
+
+if (Test-Path $latestVersionFile) {
+  $latestVersion = Get-Content $latestVersionFile
+  $currentProfile = Get-Content $profile -Raw
+  [version]$currentVersion = "0.0.0"
+  if ($currentProfile -match $versionRegEx) {
+    $currentVersion = $matches.Version
+  }
+
+  if ($latestVersion -gt $currentVersion) {
+    Write-Verbose "Your version: $currentVersion" -Verbose
+    Write-Verbose "New version: $latestVersion" -Verbose
+    $choice = Read-Host -Prompt "Found newer profile, install? (Y)"
+    if ($choice -eq "Y" -or $choice -eq "") {
+      try {
+        $gist = Invoke-RestMethod $gistUrl -ErrorAction Stop
+        $gistProfile = $gist.Files."profile.ps1".Content
+        Set-Content -Path $profile -Value $gistProfile
+        Write-Verbose "Installed newer version of profile" -Verbose
+        . $profile
+        return
+      }
+      catch {
+        # we can hit rate limit issue with GitHub since we're using anonymous
+        Write-Verbose -Verbose "Was not able to access gist, try again next time"
+      }
+    }
+  }
+}
+
+$null = Start-ThreadJob -Name "Get version of `$profile from gist" -ArgumentList $gistUrl, $latestVersionFile, $versionRegEx -ScriptBlock {
+  param ($gistUrl, $latestVersionFile, $versionRegEx)
+
+  try {
+    $gist = Invoke-RestMethod $gistUrl -ErrorAction Stop
+
+    $gistProfile = $gist.Files."profile.ps1".Content
+    [version]$gistVersion = "0.0.0"
+    if ($gistProfile -match $versionRegEx) {
+      $gistVersion = $matches.Version
+      Set-Content -Path $latestVersionFile -Value $gistVersion
+    }
+  }
+  catch {
+    # we can hit rate limit issue with GitHub since we're using anonymous
+    Write-Verbose -Verbose "Was not able to access gist to check for newer version"
+  }
+}
+
+if ($IsWindows) {
+  Set-PSReadLineKeyHandler -Chord Ctrl+Shift+c -Function Copy
+  Set-PSReadLineKeyHandler -Chord Ctrl+Shift+v -Function Paste
+}
+
+Set-PSReadLineKeyHandler -Chord Ctrl+b -Function BackwardWord
+
+function prompt {
+  # set window title
+  try {
+    if ($isWindows) {
+      $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+      $windowsPrincipal = [Security.Principal.WindowsPrincipal]::new($identity)
+      if ($windowsPrincipal.IsInRole("Administrators") -eq 1) {
+        $prefix = "Admin:"
+      }
+    }
+
+    $Host.ui.RawUI.WindowTitle = "$prefix$PWD"
+  } catch {
+    # do nothing if can't be set
+  }
+}
+
+Import-Module posh-git
+Import-Module oh-my-posh
+Set-Theme Paradox_Sigi
+```
 
 ## Copy Paradox_Sigi 
 
 Copy the file to theme folder or 'C:\Program Files\WindowsPowerShell\Modules\oh-my-posh\2.0.230\Themes'
+or
+```powershell
+
+C:\Users\<username>\Documents\PowerShell\Modules\oh-my-posh\2.0.399\Themes
+
+```
 
 ## Configure vscode to use the font
 
 ```Powershell
 
 {
-    "terminal.integrated.fontFamily": "'Meslo LG S for Powerline'",
-    "terminal.integrated.fontSize": 12,
+    "workbench.startupEditor": "newUntitledFile",
+    "editor.fontSize": 16,
+    "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace",
+    "debug.console.fontSize": 16,
+    "markdown.preview.fontSize": 16,
+    "terminal.integrated.fontSize": 16,
+    "editor.renderWhitespace": "all",
+    "extensions.ignoreRecommendations": true,
+    "go.formatTool": "goimports",
+    "go.useLanguageServer": true
 }
 
 ```
