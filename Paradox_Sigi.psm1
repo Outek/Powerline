@@ -1,4 +1,4 @@
-#requires -Version 2 -Modules posh-git
+#requires -Version 7 -Modules posh-git
 
 function Write-Theme {
     param(
@@ -18,23 +18,46 @@ function Write-Theme {
 
     #check for elevated prompt
     If (Test-Administrator) {
-        #$prompt += Write-Prompt -Object "$($sl.PromptSymbols.ElevatedSymbol) " -ForegroundColor $sl.Colors.AdminIconForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
+        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.ElevatedSymbol) " -ForegroundColor $sl.Colors.AdminIconForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
     }
 
-    #$user = [System.Environment]::UserName
-    #$computer = [System.Environment]::MachineName
+    # get the execution time of the last command
+    $lastCmdTime = ""
+    $lastCmd = Get-History -Count 1
+    if ($null -ne $lastCmd) {
+        $cmdTime = $lastCmd.Duration.TotalMilliseconds
+        $units = "ms"
+        $timeColor = $color.Green
+        if ($cmdTime -gt 250 -and $cmdTime -lt 1000) {
+            $timeColor = $color.Yellow
+        }
+        elseif ($cmdTime -ge 1000) {
+            $timeColor = $color.Red
+            $units = "s"
+            $cmdTime = $lastCmd.Duration.TotalSeconds
+            if ($cmdTime -ge 60) {
+                $units = "m"
+                $cmdTIme = $lastCmd.Duration.TotalMinutes
+            }
+        }
+
+        $lastCmdTime = "$($color.Grey)[$timeColor$($cmdTime.ToString("#.##"))$units$($color.Grey)]$($color.Reset) "
+    }
+
+    $user = $sl.CurrentUser
+    $computer = $sl.CurrentHostname
     $path = Get-FullPath -dir $pwd
     if (Test-NotDefaultUser($user)) {
-        #$prompt += Write-Prompt -Object "$user@$computer " -ForegroundColor $sl.Colors.SessionInfoForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
+        $prompt += Write-Prompt -Object "$user@$computer $lastCmdTime" -ForegroundColor $sl.Colors.SessionInfoForegroundColor -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
     }
 
     if (Test-VirtualEnv) {
-        #$prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.VirtualEnvBackgroundColor
+        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.VirtualEnvBackgroundColor
         $prompt += Write-Prompt -Object "$($sl.PromptSymbols.VirtualEnvSymbol) $(Get-VirtualEnvName) " -ForegroundColor $sl.Colors.VirtualEnvForegroundColor -BackgroundColor $sl.Colors.VirtualEnvBackgroundColor
         $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.VirtualEnvBackgroundColor -BackgroundColor $sl.Colors.PromptBackgroundColor
     }
     else {
-        #$prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.PromptBackgroundColor
+        $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.PromptBackgroundColor
     }
 
     # Writes the drive portion
@@ -51,25 +74,31 @@ function Write-Theme {
     # Writes the postfix to the prompt
     $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $lastColor
 
-    #$timeStamp = Get-Date -UFormat %r
-    #$timestamp = "[$timeStamp]"
+    $timeStamp = $(Get-Date -Format f)
+    $timestamp = "[$timeStamp]"
 
-    #$prompt += Set-CursorForRightBlockWrite -textLength $timestamp.Length
-    #$prompt += Write-Prompt $timeStamp -ForegroundColor $sl.Colors.PromptForegroundColor
+    $prompt += Set-CursorForRightBlockWrite -textLength ($timestamp.Length + 1)
+    $prompt += Write-Prompt $timeStamp -ForegroundColor $sl.Colors.PromptForegroundColor
 
-    #$prompt += Set-Newline
+    $prompt += Set-Newline
 
     if ($with) {
         $prompt += Write-Prompt -Object "$($with.ToUpper()) " -BackgroundColor $sl.Colors.WithBackgroundColor -ForegroundColor $sl.Colors.WithForegroundColor
     }
-
-    #$prompt += Write-Prompt -Object $sl.PromptSymbols.PromptIndicator -ForegroundColor $sl.Colors.PromptBackgroundColor
+    $prompt += Write-Prompt -Object ($sl.PromptSymbols.PromptIndicator) -ForegroundColor $sl.Colors.PromptBackgroundColor
     $prompt += ' '
     $prompt
+
+    if ($IsWindows) {
+        Set-PSReadLineKeyHandler -Chord Ctrl+Shift+c -Function Copy
+        Set-PSReadLineKeyHandler -Chord Ctrl+Shift+v -Function Paste
+    }
+
+    Set-PSReadLineKeyHandler -Chord Ctrl+b -Function BackwardWord
 }
 
 $sl = $global:ThemeSettings #local settings
-$sl.PromptSymbols.StartSymbol = ' '
+$sl.PromptSymbols.StartSymbol = ''
 $sl.PromptSymbols.PromptIndicator = [char]::ConvertFromUtf32(0x276F)
 $sl.PromptSymbols.SegmentForwardSymbol = [char]::ConvertFromUtf32(0xE0B0)
 $sl.Colors.PromptForegroundColor = [ConsoleColor]::White
