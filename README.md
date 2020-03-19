@@ -2,16 +2,16 @@
 
 ## Files
 
-### Microsoft.PowerShell_profile.ps1
+#### Microsoft.PowerShell_profile.ps1
 Powershell profile
 
-### profiles.json
+#### profiles.json
 Windows Terminal configurations
  
-### Paradox_Sigi.psm1
+#### Paradox_Sigi.psm1
 Modified Paradox Theme from Powerline
 
-### settings.json
+#### settings.json
 Personal vscode settings
 
 ## Install needed fonts
