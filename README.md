@@ -144,7 +144,7 @@ C:\Users\<username>\Documents\PowerShell\Modules\oh-my-posh\2.0.399\Themes
 {
     "workbench.startupEditor": "newUntitledFile",
     "editor.fontSize": 16,
-    "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace",
+    "editor.fontFamily": "'Cascadia Code PL', Consolas, 'Courier New', monospace",
     "debug.console.fontSize": 16,
     "markdown.preview.fontSize": 16,
     "terminal.integrated.fontSize": 16,
