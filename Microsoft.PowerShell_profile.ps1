@@ -1,6 +1,6 @@
 #Requires -Version 7
 
-# Version 1.0.6
+# Version 1.0.7
 
 # check if newer version
 $gistUrl = "https://api.github.com/gists/569c2288c015150eba622e860a4a6d2b"
@@ -81,4 +81,5 @@ function prompt {
 
 Import-Module posh-git
 Import-Module oh-my-posh
-Set-Theme Paradox_Sigi
+Import-Module Terminal-Icons
+Set-PoshPrompt -Theme paradox_sigi
