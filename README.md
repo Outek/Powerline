@@ -25,7 +25,7 @@ Install all Cascadia Code Fonts
 
 Install-Module posh-git -Scope CurrentUser -Force
 Install-Module oh-my-posh -Scope CurrentUser -Force
-Install-Module  -Scope CurrentUser -Force
+Install-Module Terminal-Icons -Scope CurrentUser -Force
 Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
 
 ```
